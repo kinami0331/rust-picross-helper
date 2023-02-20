@@ -1,0 +1,7 @@
+[workspace]
+
+members = [
+    "game_cli",
+    "game_core",
+    "game_lib_wasm",
+]
