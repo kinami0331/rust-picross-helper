@@ -1,4 +1,5 @@
 use super::components::Line;
+use serde::{Deserialize, Serialize};
 
 pub struct GameCore {
     pub row_size: u8,
@@ -7,6 +8,14 @@ pub struct GameCore {
     pub col_constraint: Vec<Vec<u8>>,
     pub row_lines: Vec<Line>,
     pub col_lines: Vec<Line>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct GameInfo {
+    pub row_size: u8,
+    pub col_size: u8,
+    pub row_constraint: Vec<Vec<u8>>,
+    pub col_constraint: Vec<Vec<u8>>,
 }
 
 impl GameCore {
@@ -23,16 +32,32 @@ impl GameCore {
             col_lines.push(Line::new(col_size, col_constraint[i as usize].clone()));
         }
 
-        return GameCore {
+        GameCore {
             row_size,
             col_size,
             row_constraint,
             col_constraint,
             row_lines,
             col_lines,
-        };
+        }
     }
 
+    pub fn from_json(json_str: &str) -> GameCore {
+        let game_info: GameInfo = match serde_json::from_str(json_str) {
+            Ok(game_info) => game_info,
+            Err(_) => panic!("json读取失败"),
+        };
+        
+        GameCore::new(
+            game_info.row_size,
+            game_info.col_size,
+            game_info.row_constraint,
+            game_info.col_constraint,
+        )
+    }
+}
+
+impl GameCore {
     pub fn get_info(&self) -> String {
         let mut rst = String::from("Game Info:\n");
         rst.push_str(&std::format!("    row size: {}\n", self.row_size));
