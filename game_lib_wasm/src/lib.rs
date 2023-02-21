@@ -11,7 +11,7 @@ extern {
 
 #[wasm_bindgen]
 pub fn greet() {
-    let game = GameCore::new(15, 15);
-    alert(&game.get_info());
-    log(&game.get_info());
+    // let game = GameCore::new(15, 15);
+    // alert(&game.get_info());
+    // log(&game.get_info());
 }
