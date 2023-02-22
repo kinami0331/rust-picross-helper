@@ -9,16 +9,18 @@ pub struct Line {
 
     pub valid_number: u64,
     pub valid_set: HashSet<u64>,
-    pub comfirmed_mask: u64,
+    pub confirmed_true_mask: u64,
+    pub confirmed_false_mask: u64,
+    pub confirmed_mask: u64,
 }
 
 impl Line {
     pub fn new(size: u8, constraint: Vec<u8>) -> Line {
         let valid_number = Line::calc_init_valid_number(size, &constraint);
         let valid_set = Line::gen_init_valid_set(size, &constraint);
-        let true_and = valid_set.iter().fold(!0, |acc, e| acc & e);
-        let false_and = valid_set.iter().fold(!0, |acc, e| acc & (!e));
-        let comfirmed_mask = true_and | false_and;
+        let confirmed_true_mask = valid_set.iter().fold(!0, |acc, e| acc & e);
+        let confirmed_false_mask = valid_set.iter().fold(!0, |acc, e| acc & (!e));
+        let confirmed_mask = confirmed_true_mask | confirmed_false_mask;
 
         return Line {
             size,
@@ -27,7 +29,9 @@ impl Line {
             constraint,
             valid_number,
             valid_set,
-            comfirmed_mask,
+            confirmed_true_mask,
+            confirmed_false_mask,
+            confirmed_mask,
         };
     }
 
@@ -67,7 +71,6 @@ impl Line {
                 ans |= seg_bits[idx] << cur_idx;
                 cur_idx += constraint[idx];
             }
-
             rst.insert(ans);
         }
 
@@ -80,9 +83,23 @@ impl Line {
         return (self.confirmed >> index) & 1 == 1;
     }
 
+    pub fn update_confirmed_mask(&mut self) {
+        let confirmed_true_mask = self.valid_set.iter().fold(!0, |acc, e| acc & e);
+        let confirmed_false_mask = self.valid_set.iter().fold(!0, |acc, e| acc & (!e));
+        self.confirmed_true_mask = confirmed_true_mask & !self.confirmed;
+        self.confirmed_false_mask = confirmed_false_mask & !self.confirmed;
+        self.confirmed_mask = self.confirmed_true_mask | self.confirmed_false_mask;
+    }
+
     pub fn set_at(&mut self, index: u8, value: u8) {
         // TODO: 后面改成更健壮的检查
-        assert!(!self.confirmed_at(index));
+        if self.confirmed_at(index) {
+            if ((self.filled >> index) & 1) != value as u64 {
+                panic!("矛盾！")
+            }
+            return;
+        }
+
         self.confirmed |= 1 << index;
         if value != 0 {
             self.filled |= 1 << index;
@@ -91,9 +108,17 @@ impl Line {
         self.valid_set.retain(|x| (x >> index) & 1 == value as u64);
         self.valid_number = self.valid_set.len() as u64;
         assert_ne!(self.valid_number, 0);
-        let true_and = self.valid_set.iter().fold(!0, |acc, e| acc & e);
-        let false_and = self.valid_set.iter().fold(!0, |acc, e| acc & (!e));
-        self.comfirmed_mask = true_and | false_and;
+        self.update_confirmed_mask();
+    }
+
+    pub fn apply_confirmed_mask(&mut self) {
+        // 更新 valid set
+        self.valid_set
+            .retain(|x| (!x & self.confirmed_true_mask == 0) && (x & self.confirmed_false_mask == 0));
+        self.valid_number = self.valid_set.len() as u64;
+        self.confirmed |= self.confirmed_mask;
+        self.filled |= self.confirmed_true_mask;
+        self.update_confirmed_mask();
     }
 }
 
@@ -162,7 +187,7 @@ impl Line {
             // 已经放置了具体值的直接显示 "-"
             if (self.confirmed >> i) & 1 == 0 {
                 // 如果这一位已经能确定，显示对应的符号
-                if (self.comfirmed_mask >> i) & 1 != 0 {
+                if (self.confirmed_mask >> i) & 1 != 0 {
                     let t = *self.valid_set.iter().next().unwrap();
                     if (t >> i) & 1 != 0 {
                         rst += "o";

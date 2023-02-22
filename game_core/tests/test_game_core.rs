@@ -118,3 +118,114 @@ fn test_game_core_set_cell() {
     let game_str = format!("{:#?}", game);
     println!("{}", game_str);
 }
+
+#[test]
+fn test_solve_p001() {
+    use std::fs;
+    use std::path;
+
+    let mut json_path = path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    json_path.push("../demo_game/s1.normal.p001.json");
+
+    let json_str = fs::read_to_string(json_path).expect("打开文件失败");
+
+    let mut game = GameCore::from_json(&json_str);
+    let game_str = format!("{:#?}", game);
+    println!("{}", game_str);
+
+    game.solve();
+
+    let game_str = format!("{:#?}", game);
+    println!("{}", game_str);
+
+    println!("{:-}", game);
+}
+
+#[test]
+fn test_solve_p006() {
+    use std::fs;
+    use std::path;
+
+    let mut json_path = path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    json_path.push("../demo_game/s1.normal.p006.json");
+
+    let json_str = fs::read_to_string(json_path).expect("打开文件失败");
+
+    let mut game = GameCore::from_json(&json_str);
+    let game_str = format!("{:#?}", game);
+    println!("{}", game_str);
+
+    game.solve();
+
+    let game_str = format!("{:#?}", game);
+    println!("{}", game_str);
+
+    println!("{:-}", game);
+}
+
+#[test]
+fn test_solve_p089() {
+    use std::fs;
+    use std::path;
+
+    let mut json_path = path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    json_path.push("../demo_game/s1.normal.p089.json");
+
+    let json_str = fs::read_to_string(json_path).expect("打开文件失败");
+
+    let mut game = GameCore::from_json(&json_str);
+    let game_str = format!("{:#?}", game);
+    println!("{}", game_str);
+
+    game.solve();
+
+    let game_str = format!("{:#?}", game);
+    println!("{}", game_str);
+
+    println!("{:-}", game);
+}
+
+#[test]
+fn test_solve_p091() {
+    use std::fs;
+    use std::path;
+
+    let mut json_path = path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    json_path.push("../demo_game/s1.normal.p091.json");
+
+    let json_str = fs::read_to_string(json_path).expect("打开文件失败");
+
+    let mut game = GameCore::from_json(&json_str);
+    game.solve();
+    println!("{:-}", game);
+}
+
+#[test]
+fn test_solve_p136() {
+    use std::fs;
+    use std::path;
+
+    let mut json_path = path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    json_path.push("../demo_game/s1.normal.p136.json");
+
+    let json_str = fs::read_to_string(json_path).expect("打开文件失败");
+
+    let mut game = GameCore::from_json(&json_str);
+    game.solve();
+    println!("{:-}", game);
+}
+
+#[test]
+fn test_solve_25x25_1121366() {
+    use std::fs;
+    use std::path;
+
+    let mut json_path = path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    json_path.push("../demo_game/25x25_1121366.json");
+
+    let json_str = fs::read_to_string(json_path).expect("打开文件失败");
+
+    let mut game = GameCore::from_json(&json_str);
+    game.solve();
+    println!("{:-}", game);
+}

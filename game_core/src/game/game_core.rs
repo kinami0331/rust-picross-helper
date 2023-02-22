@@ -24,12 +24,12 @@ impl GameCore {
 
         let mut row_lines = Vec::<Line>::with_capacity(row_size.into());
         for i in 0..row_size {
-            row_lines.push(Line::new(row_size, row_constraint[i as usize].clone()));
+            row_lines.push(Line::new(col_size, row_constraint[i as usize].clone()));
         }
 
         let mut col_lines = Vec::<Line>::new();
         for i in 0..col_size {
-            col_lines.push(Line::new(col_size, col_constraint[i as usize].clone()));
+            col_lines.push(Line::new(row_size, col_constraint[i as usize].clone()));
         }
 
         GameCore {
@@ -71,6 +71,71 @@ impl GameCore {
     }
 }
 
+// solver 相关
+impl GameCore {
+    pub fn solve(&mut self) {
+        loop {
+            let mut changed = false;
+            // 遍历行
+            for row_idx in 0..self.row_size {
+                if self.row_lines[row_idx as usize].confirmed_mask == 0 {
+                    continue;
+                }
+                changed = true;
+
+                let line = &mut self.row_lines[row_idx as usize];
+                for col_idx in 0..self.col_size {
+                    if (line.confirmed_mask >> col_idx) & 1 == 0 {
+                        continue;
+                    }
+                    if (line.confirmed_true_mask >> col_idx) & 1 != 0 {
+                        self.col_lines[col_idx as usize].set_at(row_idx, 1);
+                    } else {
+                        self.col_lines[col_idx as usize].set_at(row_idx, 0);
+                    }
+                }
+                line.apply_confirmed_mask();
+            }
+
+            // 遍历列
+            for col_idx in 0..self.col_size {
+                if self.col_lines[col_idx as usize].confirmed_mask == 0 {
+                    continue;
+                }
+                changed = true;
+
+                let line = &mut self.col_lines[col_idx as usize];
+                for row_idx in 0..self.row_size {
+                    if (line.confirmed_mask >> row_idx) & 1 == 0 {
+                        continue;
+                    }
+                    if (line.confirmed_true_mask >> row_idx) & 1 != 0 {
+                        self.row_lines[row_idx as usize].set_at(col_idx, 1);
+                    } else {
+                        self.row_lines[row_idx as usize].set_at(col_idx, 0);
+                    }
+                }
+                line.apply_confirmed_mask();
+            }
+
+            // debug assert
+            // for i in 0..self.row_size {
+            //     for j in 0..self.col_size {
+            //         assert_eq!(
+            //             self.row_lines[i as usize].confirmed_at(j),
+            //             self.col_lines[j as usize].confirmed_at(i)
+            //         );
+            //     }
+            // }
+            // ---------
+
+            if !changed {
+                break;
+            }
+        }
+    }
+}
+
 impl GameCore {
     pub fn get_info(&self) -> String {
         let mut rst = String::from("Game Info:\n");
@@ -100,5 +165,18 @@ impl std::fmt::Debug for GameCore {
             write!(f, "{}", self.col_lines[i as usize].debug_info(6, f.alternate()))?;
         }
         write!(f, "")
+    }
+}
+
+impl std::fmt::Display for GameCore {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if f.sign_minus() {
+            for i in 0..self.row_size {
+                writeln!(f, "{}", self.row_lines[i as usize].debug_line_status_str())?;
+            }
+            writeln!(f, "")
+        } else {
+            writeln!(f, "{:?}", self)
+        }
     }
 }
