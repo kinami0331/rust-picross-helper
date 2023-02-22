@@ -9,12 +9,17 @@ pub struct Line {
 
     pub valid_number: u64,
     pub valid_set: HashSet<u64>,
+    pub comfirmed_mask: u64,
 }
 
 impl Line {
     pub fn new(size: u8, constraint: Vec<u8>) -> Line {
         let valid_number = Line::calc_init_valid_number(size, &constraint);
         let valid_set = Line::gen_init_valid_set(size, &constraint);
+        let true_and = valid_set.iter().fold(!0, |acc, e| acc & e);
+        let false_and = valid_set.iter().fold(!0, |acc, e| acc & (!e));
+        let comfirmed_mask = true_and | false_and;
+
         return Line {
             size,
             confirmed: 0,
@@ -22,6 +27,7 @@ impl Line {
             constraint,
             valid_number,
             valid_set,
+            comfirmed_mask,
         };
     }
 
@@ -119,7 +125,7 @@ impl Line {
         rst
     }
 
-    pub fn cell_status_str(&self) -> String {
+    pub fn debug_line_status_str(&self) -> String {
         let mut rst = String::new();
         for i in 0..self.size {
             if i > 0 {
@@ -138,6 +144,32 @@ impl Line {
         rst
     }
 
+    pub fn debug_comfirmed_mask_status(&self) -> String {
+        let mut rst = String::new();
+        for i in 0..self.size {
+            if i > 0 {
+                rst += " ";
+            }
+            // 已经放置了具体值的直接显示 "-"
+            if (self.confirmed >> i) & 1 == 0 {
+                // 如果这一位已经能确定，显示对应的符号
+                if (self.comfirmed_mask >> i) & 1 != 0 {
+                    let t = *self.valid_set.iter().next().unwrap();
+                    if (t >> i) & 1 != 0 {
+                        rst += "o";
+                    } else {
+                        rst += "x";
+                    }
+                } else {
+                    rst += "?"
+                }
+            } else {
+                rst += "-";
+            }
+        }
+        rst
+    }
+
     pub fn debug_info(&self, base_indent: u32, detailed: bool) -> String {
         let mut rst = String::new();
         let mut indent = String::new();
@@ -145,12 +177,21 @@ impl Line {
             indent += " ";
         }
         rst += &format!("{}line constraint: {:?}\n", indent, self.constraint);
-        rst += &format!("{}cell status: | {} |\n", indent, self.cell_status_str());
+        rst += &format!(
+            "{}cell status: \n        | {} |\n",
+            indent,
+            self.debug_line_status_str()
+        );
         rst += &format!("{}current valid number: {}\n", indent, self.valid_number);
+        rst += &format!(
+            "{}current comfirmed from valid:\n        | {} |\n",
+            indent,
+            self.debug_comfirmed_mask_status()
+        );
         if detailed {
             rst += &format!("{}current valid list:\n", indent);
             for bits in &self.valid_set {
-                rst += &format!("{}    |{}|\n", indent, Line::line_str_from_bits(self.size, *bits));
+                rst += &format!("{}  | {} |\n", indent, Line::line_str_from_bits(self.size, *bits));
             }
         }
 

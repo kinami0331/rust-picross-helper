@@ -30,7 +30,7 @@ fn test_game_core_new() {
     //     );
     println!("{}", game_info_str);
 
-    let game_str = format!("{:?}", game);
+    let game_str = format!("{:#?}", game);
     println!("{}", game_str);
     //     assert_eq!(
     //         game_str,
