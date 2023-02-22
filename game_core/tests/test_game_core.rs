@@ -66,7 +66,7 @@ fn test_game_core_from_json_file() {
     let json_str = fs::read_to_string(json_path).expect("打开文件失败");
 
     let game = GameCore::from_json(&json_str);
-    let game_str = format!("{:?}", game);
+    let game_str = format!("{:#?}", game);
 
     println!("{}", game_str);
 }

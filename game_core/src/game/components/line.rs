@@ -62,25 +62,9 @@ impl Line {
                 cur_idx += constraint[idx];
             }
 
-            // println!("{:?} {:#b}", interval, ans);
             rst.insert(ans);
         }
 
-        rst
-    }
-
-    pub fn line_str_from_bits(size: u8, bits: u64) -> String {
-        let mut rst = String::new();
-        for i in 0..size {
-            if i > 0 {
-                rst += " ";
-            }
-            if (bits >> i) & 1 != 0 {
-                rst += "o";
-            } else {
-                rst += "x";
-            }
-        }
         rst
     }
 }
@@ -116,5 +100,60 @@ impl std::fmt::Debug for Line {
             }
         }
         write!(f, " | current valid number: {}", self.valid_number)
+    }
+}
+
+impl Line {
+    pub fn line_str_from_bits(size: u8, bits: u64) -> String {
+        let mut rst = String::new();
+        for i in 0..size {
+            if i > 0 {
+                rst += " ";
+            }
+            if (bits >> i) & 1 != 0 {
+                rst += "o";
+            } else {
+                rst += "x";
+            }
+        }
+        rst
+    }
+
+    pub fn cell_status_str(&self) -> String {
+        let mut rst = String::new();
+        for i in 0..self.size {
+            if i > 0 {
+                rst += " ";
+            }
+            if (self.confirmed >> i) & 1 != 0 {
+                if (self.filled >> i) & 1 != 0 {
+                    rst += "o";
+                } else {
+                    rst += "x";
+                }
+            } else {
+                rst += "-";
+            }
+        }
+        rst
+    }
+
+    pub fn debug_info(&self, base_indent: u32, detailed: bool) -> String {
+        let mut rst = String::new();
+        let mut indent = String::new();
+        for _ in 0..base_indent {
+            indent += " ";
+        }
+        rst += &format!("{}line constraint: {:?}\n", indent, self.constraint);
+        rst += &format!("{}cell status: | {} |\n", indent, self.cell_status_str());
+        rst += &format!("{}current valid number: {}\n", indent, self.valid_number);
+        if detailed {
+            rst += &format!("{}current valid list:\n", indent);
+            for bits in &self.valid_set {
+                rst += &format!("{}    |{}|\n", indent, Line::line_str_from_bits(self.size, *bits));
+            }
+        }
+
+        rst
     }
 }

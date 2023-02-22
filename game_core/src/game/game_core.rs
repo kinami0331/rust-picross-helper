@@ -85,17 +85,19 @@ impl GameCore {
 impl std::fmt::Debug for GameCore {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "Game Debug Info:")?;
-        writeln!(f, "    row size: {}", self.row_size)?;
-        writeln!(f, "    col size: {}", self.col_size)?;
-        writeln!(f, "    row_constraint: {:?}", self.row_constraint)?;
-        writeln!(f, "    col_constraint: {:?}", self.col_constraint)?;
-        writeln!(f, "    row_lines:")?;
+        writeln!(f, "  row size: {}", self.row_size)?;
+        writeln!(f, "  col size: {}", self.col_size)?;
+        writeln!(f, "  row_constraint: {:?}", self.row_constraint)?;
+        writeln!(f, "  col_constraint: {:?}", self.col_constraint)?;
+        writeln!(f, "  row_lines:")?;
         for i in 0..self.row_size {
-            writeln!(f, "        {}. {:?}", i, self.row_lines[i as usize])?;
+            writeln!(f, "    row #{}:", i)?;
+            write!(f, "{}", self.row_lines[i as usize].debug_info(6, f.alternate()))?;
         }
-        writeln!(f, "    col_lines:")?;
-        for i in 0..self.col_size {
-            writeln!(f, "        {}. {:?}", i, self.col_lines[i as usize])?;
+        writeln!(f, "  col_lines:")?;
+        for i in 0..self.row_size {
+            writeln!(f, "    col #{}:", i)?;
+            write!(f, "{}", self.col_lines[i as usize].debug_info(6, f.alternate()))?;
         }
         write!(f, "")
     }
