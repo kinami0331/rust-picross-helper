@@ -50,7 +50,6 @@ pub fn calc_balls_in_boxes_combination(k: u8, s: u8) -> Vec<Vec<u8>> {
     }
 
     inner(0, s, k, k, &mut buffer, &mut rst);
-    println!("{} {}", total_num, rst.len());
     rst
 }
 
