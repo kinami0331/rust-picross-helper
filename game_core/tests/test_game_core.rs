@@ -7,8 +7,8 @@ fn test_game_core_new() {
     // {
     //     "row_size": 5,
     //     "col_size": 5,
-    //     "row_setting": [[3], [1, 1], [3], [1], [2]],
-    //     "col_setting": [[0], [3], [1, 3], [3, 1], [0]]
+    //     "row_constraint": [[3], [1, 1], [3], [1], [2]],
+    //     "col_constraint": [[0], [3], [1, 3], [3, 1], [0]]
     // }
     let game = game_core::GameCore::new(
         5,
