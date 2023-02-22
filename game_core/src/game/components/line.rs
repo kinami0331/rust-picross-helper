@@ -81,10 +81,19 @@ impl Line {
     }
 
     pub fn set_at(&mut self, index: u8, value: u8) {
+        // TODO: 后面改成更健壮的检查
+        assert!(!self.confirmed_at(index));
         self.confirmed |= 1 << index;
         if value != 0 {
             self.filled |= 1 << index;
         }
+        // 更新 valid set
+        self.valid_set.retain(|x| (x >> index) & 1 == value as u64);
+        self.valid_number = self.valid_set.len() as u64;
+        assert_ne!(self.valid_number, 0);
+        let true_and = self.valid_set.iter().fold(!0, |acc, e| acc & e);
+        let false_and = self.valid_set.iter().fold(!0, |acc, e| acc & (!e));
+        self.comfirmed_mask = true_and | false_and;
     }
 }
 

@@ -72,25 +72,6 @@ fn test_game_core_from_json_file() {
 }
 
 #[test]
-fn test_game_core_set_cell() {
-    let json_str = r#"{"row_size":5,"col_size":5,"row_constraint":[[3],[1,1],[3],[1],[2]],"col_constraint":[[0],[3],[1,3],[3,1],[0]]}"#;
-    let mut game = GameCore::from_json(json_str);
-    let game_str = format!("{:?}", game);
-    println!("{}", game_str);
-    game.set_cell(0, 0, 0)
-        .set_cell(0, 1, 1)
-        .set_cell(0, 1, 1)
-        .set_cell(0, 2, 1)
-        .set_cell(0, 3, 1)
-        .set_cell(0, 4, 0)
-        .set_cell(4, 0, 0)
-        .set_cell(4, 4, 0)
-        .set_cell(4, 2, 1);
-    let game_str = format!("{:?}", game);
-    println!("{}", game_str);
-}
-
-#[test]
 fn test_calc_init_valid_number() {
     let size = 10;
     let constraint = vec![1, 3];
@@ -116,4 +97,24 @@ fn test_gen_init_valid_set() {
     }
 }
 
+#[test]
+fn test_game_core_set_cell() {
+    let json_str = r#"{"row_size":5,"col_size":5,"row_constraint":[[3],[1,1],[3],[1],[2]],"col_constraint":[[0],[3],[1,3],[3,1],[0]]}"#;
+    let mut game = GameCore::from_json(json_str);
+    let game_str = format!("{:#?}", game);
+    println!("{}", game_str);
+    game.set_cell(0, 0, 0);
+    let game_str = format!("{:#?}", game);
+    println!("{}", game_str);
 
+    game.set_cell(0, 1, 1)
+        .set_cell(0, 1, 1)
+        .set_cell(0, 2, 1)
+        .set_cell(0, 3, 1)
+        .set_cell(0, 4, 0)
+        .set_cell(4, 0, 0)
+        .set_cell(4, 4, 0)
+        .set_cell(4, 2, 1);
+    let game_str = format!("{:#?}", game);
+    println!("{}", game_str);
+}
