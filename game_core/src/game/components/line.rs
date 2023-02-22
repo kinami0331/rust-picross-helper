@@ -16,6 +16,19 @@ impl Line {
     }
 }
 
+impl Line {
+    pub fn confirmed_at(&self, index: u8) -> bool {
+        return (self.confirmed >> index) & 1 == 1;
+    }
+
+    pub fn set_at(&mut self, index: u8, value: u8) {
+        self.confirmed |= 1 << index;
+        if value != 0 {
+            self.filled |= 1 << index;
+        }
+    }
+}
+
 impl std::fmt::Debug for Line {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for i in 0..self.size {
@@ -24,9 +37,9 @@ impl std::fmt::Debug for Line {
             }
             if (self.confirmed >> i) & 1 != 0 {
                 if (self.filled >> i) & 1 != 0 {
-                    write!(f, "x")?;
-                } else {
                     write!(f, "o")?;
+                } else {
+                    write!(f, "x")?;
                 }
             } else {
                 write!(f, "-")?;

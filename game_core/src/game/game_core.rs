@@ -47,13 +47,27 @@ impl GameCore {
             Ok(game_info) => game_info,
             Err(_) => panic!("json读取失败"),
         };
-        
+
         GameCore::new(
             game_info.row_size,
             game_info.col_size,
             game_info.row_constraint,
             game_info.col_constraint,
         )
+    }
+}
+
+impl GameCore {
+    pub fn set_cell(&mut self, row: u8, col: u8, value: u8) -> &mut GameCore {
+        if row >= self.row_size || col >= self.col_size {
+            return self;
+        }
+        if self.row_lines[row as usize].confirmed_at(col) {
+            return self;
+        }
+        self.row_lines[row as usize].set_at(col, value);
+        self.col_lines[col as usize].set_at(row, value);
+        self
     }
 }
 
